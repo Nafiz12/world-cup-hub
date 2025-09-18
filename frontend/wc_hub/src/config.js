@@ -1,0 +1,1 @@
+export const WORLD_CUP_START = '2026-06-11T00:00:00Z'
