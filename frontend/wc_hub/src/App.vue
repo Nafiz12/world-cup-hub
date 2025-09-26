@@ -1,10 +1,12 @@
 
 <template>
   <RouterView />
+  <WorldCupChat/>
 </template>
 
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import WorldCupChat from '@/components/WorldCupChat.vue'
 
 </script>
 

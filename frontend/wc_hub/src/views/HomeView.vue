@@ -18,7 +18,7 @@
       <main class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 items-start">
        <!-- Countdown -->
       <section class="flex md:justify-start">
-              <Countdown target="2026-06-11T00:00:00Z" />
+              <Countdown :target= "WORLD_CUP_START" />
       </section>
         <!-- History -->
         <section class="md:col-span-2">
@@ -64,23 +64,12 @@ import { getWorldCupHistory } from '@/services/worldcup'
 import { WORLD_CUP_START } from '@/config'
 import Countdown from '@/components/Countdown.vue'
 
+
 const worldCups = ref([])
 const loading = ref(true)
 const error = ref(null)
 
-const countdown = ref({ days: '0', hours: '0', minutes: '0', seconds: '0' })
-function updateCountdown() {
-  const target = new Date(WORLD_CUP_START).getTime()
-  const diff = target - Date.now()
-  if (diff <= 0) { countdown.value = { days: '0', hours: '00', minutes: '00', seconds: '00' }; return }
-  const s = Math.floor(diff / 1000)
-  const days = Math.floor(s / 86400)
-  const hours = Math.floor((s % 86400) / 3600)
-  const mins = Math.floor((s % 3600) / 60)
-  const secs = s % 60
-  const pad = (n) => String(n).padStart(2, '0')
-  countdown.value = { days: String(days), hours: pad(hours), minutes: pad(mins), seconds: pad(secs) }
-}
+
 
 let id = null
 async function loadData() {
@@ -89,6 +78,6 @@ async function loadData() {
   finally { loading.value = false }
 }
 
-onMounted(() => { updateCountdown(); id = setInterval(updateCountdown, 1000); loadData() })
+onMounted(() => { loadData() })
 onBeforeUnmount(() => { if (id) clearInterval(id) })
 </script>
