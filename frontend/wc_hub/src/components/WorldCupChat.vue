@@ -101,14 +101,11 @@
 <script setup>
 import { ref, nextTick, watch } from 'vue'
 
-// open/close
+// UI state
 const open = ref(true)
-
-// messages with friendly opener
 const messages = ref([
   { role: 'assistant', content: 'Hi! Ask me anything about the FIFA World Cup—history, fixtures, records, rules.', time: now() }
 ])
-
 const input = ref('')
 const loading = ref(false)
 const scrollBox = ref(null)
@@ -117,14 +114,43 @@ function now() {
   const d = new Date()
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
-
 async function scrollToBottom() {
   await nextTick()
   if (scrollBox.value) scrollBox.value.scrollTop = scrollBox.value.scrollHeight
 }
 watch([messages, loading], scrollToBottom, { deep: true })
 
-const API_BASE = import.meta.env.VITE_API_BASE || ''
+// --- API base (normalize + require protocol) ---
+const RAW_BASE = (import.meta.env.VITE_API_BASE || '').trim()
+const API_BASE = (() => {
+  // strip trailing slashes
+  const b = RAW_BASE.replace(/\/+$/, '')
+  // if it doesn't start with http(s), it's invalid for cross-origin calls
+  if (!/^https?:\/\//i.test(b)) {
+    console.warn('VITE_API_BASE is missing protocol. Example value:',
+      'https://world-cup-hub-backend-production.up.railway.app')
+  }
+  return b
+})()
+
+function joinURL(base, path) {
+  const left = base.replace(/\/+$/, '')
+  const right = String(path || '').replace(/^\/+/, '')
+  return `${left}/${right}`
+}
+
+// Simple fetch with timeout
+async function fetchJSON(url, opts = {}, ms = 15000) {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  try {
+    const res = await fetch(url, { ...opts, signal: ctrl.signal })
+    const data = await res.json().catch(() => ({}))
+    return { ok: res.ok, status: res.status, data }
+  } finally {
+    clearTimeout(t)
+  }
+}
 
 async function send() {
   if (!input.value) return
@@ -134,28 +160,21 @@ async function send() {
   loading.value = true
 
   try {
-    const res = await fetch(`${API_BASE}/api/chat`, {
+    const url = joinURL(API_BASE, '/api/chat')
+    const { ok, status, data } = await fetchJSON(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        // send only role/content to backend; time is just for UI
         messages: messages.value.map(({ role, content }) => ({ role, content }))
       })
     })
-    const data = await res.json()
 
-    if (!res.ok || !data?.message?.content) {
-      messages.value.push({
-        role: 'assistant',
-        content: 'Sorry, I could not answer that.',
-        time: now()
-      })
+    if (!ok || !data?.message?.content) {
+      let msg = 'Sorry, I could not answer that.'
+      if (status === 0) msg = 'Network/CORS error. Check HTTPS and CORS.'
+      messages.value.push({ role: 'assistant', content: msg, time: now() })
     } else {
-      messages.value.push({
-        role: 'assistant',
-        content: data.message.content,
-        time: now()
-      })
+      messages.value.push({ role: 'assistant', content: data.message.content, time: now() })
     }
   } catch (e) {
     messages.value.push({ role: 'assistant', content: 'Network error. Please try again.', time: now() })
@@ -164,6 +183,7 @@ async function send() {
   }
 }
 </script>
+
 
 <style scoped>
 /* subtle typing animation */
