@@ -31,6 +31,7 @@ class ChatController extends Controller
     // ---- Main chat endpoint (CHAT COMPLETIONS) ----
     public function chat(Request $request)
     {
+        set_time_limit(60);
 
 //        echo "<pre>";print_r($request);exit;
         $data = $request->validate([
@@ -47,7 +48,13 @@ class ChatController extends Controller
         $resp = Http::withHeaders([
             'Authorization' => 'Bearer '.env('OPENAI_API_KEY'),
             'Content-Type'  => 'application/json',
-        ])->post('https://api.openai.com/v1/chat/completions', [
+        ])->withOptions([
+            'connect_timeout'   => 5,   // fail fast if DNS/handshake is slow
+            'timeout'           => 20,  // total max time for the request
+            'force_ip_resolve'  => 'v4' // avoid some IPv6 routing issues on hosts
+        ])
+            ->retry(2, 200)
+            ->post('https://api.openai.com/v1/chat/completions', [
             'model'    => env('OPENAI_MODEL', 'gpt-4o-mini'),
             'messages' => $messages,
             // no temperature/max tokens until we confirm working

@@ -172,12 +172,17 @@ async function send() {
     if (!ok || !data?.message?.content) {
       let msg = 'Sorry, I could not answer that.'
       if (status === 0) msg = 'Network/CORS error. Check HTTPS and CORS.'
+      else if (status >= 500) msg = `Server error (${status}). ${detail}`
+      else if (status >= 400) msg = `Request error (${status}). ${detail}`
       messages.value.push({ role: 'assistant', content: msg, time: now() })
     } else {
       messages.value.push({ role: 'assistant', content: data.message.content, time: now() })
     }
   } catch (e) {
-    messages.value.push({ role: 'assistant', content: 'Network error. Please try again.', time: now() })
+      const msg = e.name === 'AbortError'
+      ? 'The request timed out (client-side).'
+      : `Network error: ${e.message || 'Request failed.'}`
+    messages.value.push({ role: 'assistant', content: msg, time: now() })
   } finally {
     loading.value = false
   }
