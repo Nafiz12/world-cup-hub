@@ -102,7 +102,7 @@
 import { ref, nextTick, watch } from 'vue'
 
 // UI state
-const open = ref(true)
+const open = ref(false)
 const messages = ref([
   { role: 'assistant', content: 'Hi! Ask me anything about the FIFA World Cup—history, fixtures, records, rules.', time: now() }
 ])
