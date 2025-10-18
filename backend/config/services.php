@@ -35,10 +35,9 @@ return [
         ],
     ],
 
-    'apifootball'=>[
-        'base'=> env('APIFOOTBALL_BASE'.'https://v3.football.api-sports.io'),
-        'key'=> env('APIFOOTBALL_KEY')
-
-    ]
+    'apifootball' => [
+        'base' => env('APIFOOTBALL_BASE', 'https://v3.football.api-sports.io'),
+        'key'  => env('APIFOOTBALL_KEY'),
+    ],
 
 ];

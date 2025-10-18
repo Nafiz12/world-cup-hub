@@ -1,22 +1,39 @@
-@import './base.css';
+@import "./base.css";
 @import "tailwindcss";
 
-html, body { margin: 0; padding: 0; overflow-x: hidden; }
-* { box-sizing: border-box; }
-:root { scrollbar-gutter: stable both-edges; }
+/* Reset & layout */
+html, body, #app {
+  height: 100%;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  /* let vertical scroll appear normally; hide accidental horizontal overflow */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
+/* Keep gutters stable when scrollbar toggles */
+:root { scrollbar-gutter: stable; }
+
+/* App container: FULL WIDTH — no max-width, no auto margins, no padding */
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   font-weight: normal;
 }
 
+/* optional footer spacing */
 footer {
-  margin-top: 40px;  /* space above */
-  margin-bottom: 20px; /* optional space below */
+  margin-top: 40px;
+  margin-bottom: 20px;
 }
 
+/* links */
 a,
 .green {
   text-decoration: none;
@@ -24,22 +41,9 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
-
 @media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+  a:hover { background-color: hsla(160, 100%, 37%, 0.2); }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-}
+/* 🔥 remove the old desktop-only centering/grid that broke scrolling */
+/* (no body:flex, no #app:grid) */

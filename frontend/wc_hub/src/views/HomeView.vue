@@ -1,12 +1,12 @@
 <!-- src/views/HomeView.vue -->
 <template>
-  <div class="w-max">
+  <div class="w-full">
     <!-- Background -->
-    <div class="fixed inset-0 -z-20 bg-[url('/background.png')] bg-cover bg-center"></div>
+  
     <div class="fixed inset-0 -z-10 bg-black/55 backdrop-blur-sm"></div>
 
     <!-- Content -->
-    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-8 py-6 md:py-10 pb-32 text-white">
+    <div class="mx-auto w-full max-full px-4 sm:px-6 md:px-8 py-6 md:py-10 pb-32 text-white">
       <!-- Header -->
       <header class="mb-6 md:mb-8">
         <h1 class="font-extrabold tracking-tight leading-tight drop-shadow text-[clamp(2rem,3.2vw,3.75rem)]">
@@ -60,7 +60,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import HistoricalCard from '@/components/HistoricalCard.vue'
-import { getWorldCupHistory } from '@/services/worldcup'
+import { getWorldCupHistory,fetchPlayers  } from '@/services/worldcup'
 import { WORLD_CUP_START } from '@/config'
 import Countdown from '@/components/Countdown.vue'
 
@@ -75,6 +75,9 @@ async function loadData () {
   finally { loading.value = false }
 }
 
-onMounted(() => { loadData() })
+onMounted(async () => {
+  loadData();
+
+});
 onBeforeUnmount(() => { if (id) clearInterval(id) })
 </script>
