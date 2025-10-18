@@ -1,56 +1,56 @@
 <!-- src/views/HomeView.vue -->
 <template>
-  <div class="relative min-h-svh w-screen overflow-x-hidden">
-    <!-- Full-bleed wallpaper and overlay -->
+  <div class="w-max">
+    <!-- Background -->
     <div class="fixed inset-0 -z-20 bg-[url('/background.png')] bg-cover bg-center"></div>
     <div class="fixed inset-0 -z-10 bg-black/55 backdrop-blur-sm"></div>
 
-    <!-- Content container: full width on mobile, wider cap on desktop -->
-    <div class="mx-auto w-full max-w-screen-2xl px-3 sm:px-4 md:px-6 lg:px-8 py-6 md:py-10 text-white">
+    <!-- Content -->
+    <div class="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-8 py-6 md:py-10 pb-32 text-white">
       <!-- Header -->
       <header class="mb-6 md:mb-8">
-        <h1 class="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-tight drop-shadow">
+        <h1 class="font-extrabold tracking-tight leading-tight drop-shadow text-[clamp(2rem,3.2vw,3.75rem)]">
           FIFA World Cup Hub
         </h1>
       </header>
 
-      <!-- Main -->
-      <main class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 items-start">
-       <!-- Countdown -->
-      <section class="flex md:justify-start">
-              <Countdown :target= "WORLD_CUP_START" />
-      </section>
+      <!-- Main (stacked) -->
+      <main class="space-y-8">
+        <!-- Countdown -->
+        <section>
+          <div class="max-w-[420px] sm:max-w-none">
+            <Countdown :target="WORLD_CUP_START"/>
+          </div>
+        </section>
+
         <!-- History -->
-        <section class="md:col-span-2">
-          <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 drop-shadow">
+        <section>
+          <h2 class="font-bold drop-shadow text-[clamp(1.25rem,2.2vw,2rem)] mb-4">
             Historical World Cups
           </h2>
 
-          <!-- Loading -->
           <div v-if="loading" class="text-center py-10">
-            <svg class="animate-spin h-8 w-8 sm:h-10 sm:w-10 text-white mx-auto" viewBox="0 0 24 24" role="status" aria-label="Loading">
+            <svg class="animate-spin h-10 w-10 text-white mx-auto" viewBox="0 0 24 24" role="status" aria-label="Loading">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
             </svg>
             <p class="mt-2">Loading data...</p>
           </div>
 
-          <!-- Error -->
           <div v-else-if="error" class="text-center py-6 text-red-300">
             <p class="font-medium">Error loading data. Please try again later.</p>
             <p class="text-sm opacity-80 mt-1">{{ error }}</p>
           </div>
 
-          <!-- Cards: auto-fit to fill the width -->
-          <div v-else class="grid [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] gap-4 sm:gap-5">
+          <!-- Cards: predictable columns -->
+          <div v-else class="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             <HistoricalCard v-for="cup in worldCups" :key="cup.id || cup.year" :cup="cup" />
             <p v-if="worldCups.length === 0" class="text-center col-span-full text-white/80">No tournaments found.</p>
           </div>
         </section>
       </main>
 
-      <!-- Footer -->
-      <footer class="mt-10 md:mt-12 text-center text-white/70">
+      <footer class="mt-12 text-center text-white/70">
         © {{ new Date().getFullYear() }} World Cup Hub
       </footer>
     </div>
@@ -64,15 +64,12 @@ import { getWorldCupHistory } from '@/services/worldcup'
 import { WORLD_CUP_START } from '@/config'
 import Countdown from '@/components/Countdown.vue'
 
-
 const worldCups = ref([])
 const loading = ref(true)
 const error = ref(null)
 
-
-
 let id = null
-async function loadData() {
+async function loadData () {
   try { worldCups.value = await getWorldCupHistory() }
   catch (e) { console.error(e); error.value = 'Failed to fetch World Cup data.' }
   finally { loading.value = false }
