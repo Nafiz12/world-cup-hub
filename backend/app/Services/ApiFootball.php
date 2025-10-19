@@ -41,7 +41,7 @@ class ApiFootball{
 
     public function playersByTeamSeason(int $teamId, int $season): array
     {
-        
+
         return $this->get('players', [
             'team'   => $teamId,
             'season' => $season,
