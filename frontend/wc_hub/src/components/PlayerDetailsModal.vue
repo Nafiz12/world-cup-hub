@@ -20,10 +20,10 @@
       <div class="w-full max-w-3xl rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 overflow-hidden">
         <!-- header -->
         <div class="flex items-center justify-between px-5 py-4 border-b">
-          <h3 id="player-modal-title" class="text-lg font-semibold">
+          <h3 id="player-modal-title" class="text-lg font-semibold text-gray-500">
             {{ display.name }} <span v-if="display.number" class="text-gray-500">#{{ display.number }}</span>
           </h3>
-          <button class="rounded-full p-2 hover:bg-gray-100 focus:outline-none focus:ring" @click="close" aria-label="Close">✕</button>
+          <button class="rounded-full p-2 text-black hover:bg-gray-100 focus:outline-none focus:ring" @click="close" aria-label="Close">✕</button>
         </div>
 
         <!-- body -->
@@ -58,7 +58,7 @@
 
         <!-- footer -->
         <div class="px-5 py-3 border-t flex justify-end">
-          <button class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200" @click="close">Close</button>
+          <button class="px-4 py-2 rounded-l text-white bg-emerald-600 hover:bg-emerald-700" @click="close">Close</button>
         </div>
       </div>
     </div>
@@ -67,6 +67,8 @@
 
 <script setup>
 import { computed, ref, watch, nextTick } from 'vue'
+
+
 
 const props = defineProps({
   open: { type: Boolean, default: false },

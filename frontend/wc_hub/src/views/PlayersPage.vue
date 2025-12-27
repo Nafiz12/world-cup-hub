@@ -3,7 +3,7 @@
     <FullLoadingScreen />
   </div>
 
-  <div v-else class="min-h-screen flex justify-center items-start bg-gradient-to-br py-8 px-4">
+  <div v-else class="players-page min-h-screen flex justify-center items-start bg-gradient-to-br py-8 px-4">
     <div class="w-full max-w-7xl">
       <!-- keep your dark overlay -->
       <div class="fixed inset-0 -z-10 bg-black/55 backdrop-blur-sm"></div>
@@ -153,7 +153,8 @@ async function loadTeams() {
   errorMsg.value = "";
   try {
     teams.value = await fetchTeams(league.value, season.value);
-teams.value.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+
+    teams.value.sort((a,b)=> a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
 // If no team is selected yet, set default to the first one
 if (!teamId.value && teams.value.length) {
@@ -191,3 +192,8 @@ function openModal(row) {
 
 onMounted(loadTeams);
 </script>
+<style>
+  .players-page {
+  color: #1f2937; /* dark gray, readable on light cards */
+}
+</style>
