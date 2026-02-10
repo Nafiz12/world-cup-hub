@@ -85,6 +85,10 @@
 
   <!-- Modal (uses the SAME row data) -->
   <PlayerDetailsModal :open="modalOpen" :row="activeRow" @close="(modalvalu)=>{modalOpen=modalvalu}" />
+
+  <footer class="mt-12 text-center text-white/70">
+        © {{ new Date().getFullYear() }} World Cup Hub created by <a href="https://mdnafizalifat.vercel.app/" target="_blank" class="underline hover:text-white">Md Nafiz Al ifat</a>.
+      </footer>
 </template>
 
 <script setup>
