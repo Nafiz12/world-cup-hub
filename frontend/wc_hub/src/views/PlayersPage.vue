@@ -200,4 +200,5 @@ onMounted(loadTeams);
   .players-page {
   color: #1f2937; /* dark gray, readable on light cards */
 }
+
 </style>

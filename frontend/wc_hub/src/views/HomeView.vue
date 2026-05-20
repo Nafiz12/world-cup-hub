@@ -79,5 +79,6 @@ onMounted(async () => {
   loadData();
 
 });
+
 onBeforeUnmount(() => { if (id) clearInterval(id) })
 </script>
