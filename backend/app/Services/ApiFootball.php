@@ -56,5 +56,6 @@ class ApiFootball{
             'season' => $season,
         ]);
     }
+    
 
 }

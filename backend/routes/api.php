@@ -51,3 +51,4 @@ Route::get('/worldcup/teams', function (\Illuminate\Http\Request $r, ApiFootball
     ]);
 });
 
+
