@@ -15,12 +15,25 @@ Route::get('/world-cup-history', [WorldcupHistoryController::class, 'index']);
 Route::post('/chat', [ChatController::class, 'chat']);        // main endpoint for your Vue widget
 Route::get('/test-openai', [ChatController::class, 'test']);  // quick probe in browser
 
-Route::get('test/worldcup/players',function (Request $request,ApiFootball $api){
-
-        $team = (int) $request->query('team',26);
-        $season = (int) $request->query('season',2022);
+Route::get('test/worldcup/players', function (Request $request, ApiFootball $api) {
+    try {
+        $team = (int) $request->query('team', 26);
+        $season = (int) $request->query('season', 2022);
 
         return response()->json($api->playersByTeamSeason($team, $season));
+    } catch (\Illuminate\Http\Client\RequestException $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Third-party API is unavailable.',
+            'source' => 'thirdparty',
+        ], 502);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Backend server error.',
+            'source' => 'backend',
+        ], 500);
+    }
 });
 
 Route::get('/__debug/config-key', function () {
@@ -31,24 +44,37 @@ Route::get('/__debug/config-key', function () {
 });
 
 Route::get('/worldcup/teams', function (\Illuminate\Http\Request $r, ApiFootball $api) {
-    $league = (int) $r->query('league', 1);   // World Cup league id
-    $season = (int) $r->query('season', 2022);
+    try {
+        $league = (int) $r->query('league', 1);   // World Cup league id
+        $season = (int) $r->query('season', 2022);
 
-    $raw = $api->teamsByLeagueSeason($league, $season);
-    $items = array_map(function ($row) {
-        $t = $row['team'] ?? [];
-        return [
-            'id'   => $t['id']   ?? null,
-            'name' => $t['name'] ?? null,
-            'logo' => $t['logo'] ?? null,
-        ];
-    }, $raw['response'] ?? []);
+        $raw = $api->teamsByLeagueSeason($league, $season);
+        $items = array_map(function ($row) {
+            $t = $row['team'] ?? [];
+            return [
+                'id'   => $t['id']   ?? null,
+                'name' => $t['name'] ?? null,
+                'logo' => $t['logo'] ?? null,
+            ];
+        }, $raw['response'] ?? []);
 
-    return response()->json([
-        'ok'    => true,
-        'count' => count($items),
-        'teams' => $items,
-    ]);
+        return response()->json([
+            'ok'    => true,
+            'count' => count($items),
+            'teams' => $items,
+        ]);
+    } catch (\Illuminate\Http\Client\RequestException $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Third-party API is unavailable.',
+            'source' => 'thirdparty',
+        ], 502);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Backend server error.',
+            'source' => 'backend',
+        ], 500);
+    }
 });
-
 

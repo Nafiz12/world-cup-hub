@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 
 class ApiFootball{
@@ -21,21 +22,22 @@ class ApiFootball{
 
     protected function get(string $path, array $query = []): array
     {
-
-
         if ($this->key === '') {
             throw new \RuntimeException('API-Football key is empty. Check .env APIFOOTBALL_KEY and run: php artisan config:clear');
         }
 
         $url = $this->base.ltrim($path,'/');
 
+        try {
+            $resp = Http::withHeaders([
+                'x-apisports-key' => $this->key,
+                'accept'          => 'application/json',
+            ])->get($url, $query)->throw();
+        } catch (RequestException $e) {
+            throw new \RuntimeException('API-Football is unavailable. Please try again later.', 0, $e);
+        }
 
-        $resp= http::withHeaders([
-            'x-apisports-key' => $this->key,
-            'accept'          => 'application/json',
-        ])->get($url,$query)->throw();;
-
-        return $resp->json()??[];
+        return $resp->json() ?? [];
     }
 
 
@@ -56,6 +58,6 @@ class ApiFootball{
             'season' => $season,
         ]);
     }
-    
+
 
 }
