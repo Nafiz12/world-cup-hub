@@ -167,7 +167,13 @@ if (!teamId.value && teams.value.length) {
 
 
   } catch (e) {
-    errorMsg.value = e.message || "Failed to load teams.";
+    if (e.response?.data?.source === 'thirdparty') {
+      errorMsg.value = 'Third-party API is currently down. Please try again later.'
+    } else if (e.response?.status >= 500 || (e.request && !e.response)) {
+      errorMsg.value = 'Backend server is currently down. Please try again later.'
+    } else {
+      errorMsg.value = e.message || "Failed to load teams."
+    }
   } finally {
     loadingTeams.value = false;
   }
@@ -181,7 +187,13 @@ async function loadPlayers() {
     rows.value = await fetchPlayers(Number(teamId.value), Number(season.value));
   } catch (e) {
     rows.value = [];
-    errorMsg.value = e.message || "Failed to load players.";
+    if (e.response?.data?.source === 'thirdparty') {
+      errorMsg.value = 'Third-party API is currently down. Please try again later.'
+    } else if (e.response?.status >= 500 || (e.request && !e.response)) {
+      errorMsg.value = 'Backend server is currently down. Please try again later.'
+    } else {
+      errorMsg.value = e.message || "Failed to load players."
+    }
   } finally {
     loading.value = false;
   }

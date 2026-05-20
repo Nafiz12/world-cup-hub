@@ -70,9 +70,18 @@ const error = ref(null)
 
 let id = null
 async function loadData () {
-  try { worldCups.value = await getWorldCupHistory() }
-  catch (e) { console.error(e); error.value = 'Failed to fetch World Cup data.' }
-  finally { loading.value = false }
+  try {
+    worldCups.value = await getWorldCupHistory()
+  } catch (e) {
+    console.error(e)
+    if (e.response?.status >= 500) {
+      error.value = 'Backend Server is currently down. Please try again later.'
+    } else {
+      error.value = 'Failed to fetch World Cup data.'
+    }
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(async () => {
