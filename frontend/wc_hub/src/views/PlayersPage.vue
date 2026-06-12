@@ -160,11 +160,9 @@ async function loadTeams() {
 
     teams.value.sort((a,b)=> a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 
-// If no team is selected yet, set default to the first one
-if (!teamId.value && teams.value.length) {
-  teamId.value = teams.value[0].id;
-}
-
+    if (!teamId.value && teams.value.length) {
+      teamId.value = teams.value[0].id;
+    }
 
   } catch (e) {
     if (e.response?.data?.source === 'thirdparty') {

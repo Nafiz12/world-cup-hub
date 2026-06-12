@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import PlayersPage from '@/views/PlayersPage.vue'
+import GroupsPage from '@/views/GroupsPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,12 +12,17 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path :'/players',
-      name: "players",
-      component: PlayersPage
-    }
+      path: '/FW26',
+      name: 'fw26',
+      component: GroupsPage,
+    },
+    {
+      path: '/players',
+      name: 'players',
+      component: PlayersPage,
+    },
   ],
-    scrollBehavior() {
+  scrollBehavior() {
     return { top: 0 }
   },
 })
