@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use App\Http\Controllers\WorldcupHistoryController;
 use App\Http\Controllers\ChatController;
 use App\Services\ApiFootball;
@@ -14,6 +16,129 @@ Route::get('/world-cup-history', [WorldcupHistoryController::class, 'index']);
 
 Route::post('/chat', [ChatController::class, 'chat']);        // main endpoint for your Vue widget
 Route::get('/test-openai', [ChatController::class, 'test']);  // quick probe in browser
+
+Route::get('/live-scores', function (Request $request) {
+    try {
+        $limit = (int) ($request->query('limit', 3) ?: 3);
+
+        $response = Http::timeout(20)
+            ->get('https://api.fifa.com/api/v3/calendar/matches', [
+                'language' => 'en',
+                'from' => '2026-06-11',
+                'to' => '2026-07-19',
+                'count' => 500,
+            ]);
+
+        $matches = collect($response->json('Results', []))
+            ->filter(function (array $match) {
+                $competition = $match['CompetitionName'][0]['Description'] ?? '';
+
+                return Str::contains(strtolower($competition), 'world cup');
+            })
+            ->map(function (array $match) {
+                $statusCode = (int) ($match['MatchStatus'] ?? 0);
+                $statusLabel = match ($statusCode) {
+                    0 => 'Just finished',
+                    1 => 'About to start',
+                    2, 3 => 'Live now',
+                    default => 'Fixture update pending',
+                };
+
+                return [
+                    'id' => $match['IdMatch'] ?? null,
+                    'match_number' => (int) ($match['MatchNumber'] ?? 0),
+                    'stage_name' => $match['StageName'][0]['Description'] ?? 'FIFA World Cup',
+                    'group_name' => $match['GroupName'][0]['Description'] ?? null,
+                    'datetime' => $match['Date'] ?? null,
+                    'home_team' => [
+                        'name' => $match['Home']['TeamName'][0]['Description'] ?? 'TBD',
+                        'goals' => $match['Home']['Score'] ?? 0,
+                    ],
+                    'away_team' => [
+                        'name' => $match['Away']['TeamName'][0]['Description'] ?? 'TBD',
+                        'goals' => $match['Away']['Score'] ?? 0,
+                    ],
+                    'home_score' => $match['Home']['Score'] ?? 0,
+                    'away_score' => $match['Away']['Score'] ?? 0,
+                    'status_code' => $statusCode,
+                    'status_label' => $statusLabel,
+                    'status' => $statusLabel,
+                ];
+            })
+            ->sortBy(['match_number', 'datetime'])
+            ->values()
+            ->take($limit)
+            ->all();
+
+        return response()->json($matches, $response->status());
+    } catch (\Throwable $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Live scores are currently unavailable.',
+            'message' => $e->getMessage(),
+        ], 502);
+    }
+});
+
+Route::get('/fixtures', function (Request $request) {
+    try {
+        $response = Http::timeout(20)
+            ->get('https://api.fifa.com/api/v3/calendar/matches', [
+                'language' => 'en',
+                'from' => '2026-06-11',
+                'to' => '2026-07-19',
+                'count' => 500,
+            ]);
+
+        $matches = collect($response->json('Results', []))
+            ->filter(function (array $match) {
+                $competition = $match['CompetitionName'][0]['Description'] ?? '';
+
+                return Str::contains(strtolower($competition), 'world cup');
+            })
+            ->map(function (array $match) {
+                $statusCode = (int) ($match['MatchStatus'] ?? 0);
+                $statusLabel = match ($statusCode) {
+                    0 => 'Just finished',
+                    1 => 'About to start',
+                    2, 3 => 'Live now',
+                    default => 'Fixture update pending',
+                };
+
+                return [
+                    'id' => $match['IdMatch'] ?? null,
+                    'match_number' => (int) ($match['MatchNumber'] ?? 0),
+                    'stage_name' => $match['StageName'][0]['Description'] ?? 'FIFA World Cup',
+                    'group_name' => $match['GroupName'][0]['Description'] ?? null,
+                    'datetime' => $match['Date'] ?? null,
+                    'home_team' => [
+                        'name' => $match['Home']['TeamName'][0]['Description'] ?? 'TBD',
+                        'goals' => $match['Home']['Score'] ?? 0,
+                    ],
+                    'away_team' => [
+                        'name' => $match['Away']['TeamName'][0]['Description'] ?? 'TBD',
+                        'goals' => $match['Away']['Score'] ?? 0,
+                    ],
+                    'home_score' => $match['Home']['Score'] ?? 0,
+                    'away_score' => $match['Away']['Score'] ?? 0,
+                    'status_code' => $statusCode,
+                    'status_label' => $statusLabel,
+                    'status' => $statusLabel,
+                ];
+            })
+            ->sortBy(['match_number', 'datetime'])
+            ->values()
+            ->all();
+
+        return response()->json($matches, $response->status());
+    } catch (\Throwable $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Fixtures are currently unavailable.',
+            'message' => $e->getMessage(),
+        ], 502);
+    }
+});
 
 Route::get('test/worldcup/players', function (Request $request, ApiFootball $api) {
     try {

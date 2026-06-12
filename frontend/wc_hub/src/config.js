@@ -1,1 +1,2 @@
 export const WORLD_CUP_START = '2026-06-11T00:00:00Z'
+export const WORLD_CUP_END = '2026-07-19T23:59:59Z'

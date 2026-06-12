@@ -16,10 +16,17 @@
 
       <!-- Main (stacked) -->
       <main class="space-y-8">
-        <!-- Countdown -->
+        <!-- Tournament status -->
         <section>
-          <div class="max-w-[420px] sm:max-w-none">
-            <Countdown :target="WORLD_CUP_START"/>
+          <div class="grid gap-6 lg:grid-cols-[1.1fr_1fr] items-start">
+            <div class="max-w-[420px] sm:max-w-none">
+              <Countdown
+                :target="WORLD_CUP_END"
+                title="Tournament ends in"
+                subtitle="The final match is scheduled for 19 July 2026."
+              />
+            </div>
+            <LiveScores />
           </div>
         </section>
 
@@ -60,9 +67,10 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import HistoricalCard from '@/components/HistoricalCard.vue'
-import { getWorldCupHistory,fetchPlayers  } from '@/services/worldcup'
-import { WORLD_CUP_START } from '@/config'
+import { getWorldCupHistory } from '@/services/worldcup'
+import { WORLD_CUP_END } from '@/config'
 import Countdown from '@/components/Countdown.vue'
+import LiveScores from '@/components/LiveScores.vue'
 
 const worldCups = ref([])
 const loading = ref(true)
