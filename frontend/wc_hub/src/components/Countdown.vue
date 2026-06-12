@@ -3,8 +3,9 @@
     class="w-full md:max-w-sm rounded-2xl bg-white/10 ring-1 ring-white/15 shadow-xl p-4 sm:p-5"
   >
     <h2 id="countdown-heading" class="text-lg sm:text-xl font-semibold mb-2 text-white/90">
-      Road to <span class="font-extrabold">2026</span>
+      {{ title }}
     </h2>
+    <p v-if="subtitle" class="text-sm text-white/70 mb-4">{{ subtitle }}</p>
 
     <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center select-none">
       <div>
@@ -35,6 +36,14 @@ const props = defineProps({
   target: {
     type: String,
     required: true,
+  },
+  title: {
+    type: String,
+    default: 'Road to 2026',
+  },
+  subtitle: {
+    type: String,
+    default: '',
   },
 })
 

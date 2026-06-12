@@ -14,7 +14,30 @@
         </div> -->
       </div>
 
-      <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <div class="mb-6 flex flex-wrap gap-3 rounded-3xl border border-white/10 bg-white/5 p-2 shadow-lg backdrop-blur">
+        <button
+          type="button"
+          class="rounded-2xl px-4 py-2 text-sm font-semibold transition"
+          :class="activeTab === 'groups' ? 'bg-cyan-400/20 text-cyan-100 ring-1 ring-cyan-300/30' : 'text-white/70 hover:bg-white/8 hover:text-white'"
+          @click="activeTab = 'groups'"
+        >
+          Groups
+        </button>
+        <button
+          type="button"
+          class="rounded-2xl px-4 py-2 text-sm font-semibold transition"
+          :class="activeTab === 'fixtures' ? 'bg-emerald-400/20 text-emerald-100 ring-1 ring-emerald-300/30' : 'text-white/70 hover:bg-white/8 hover:text-white'"
+          @click="activeTab = 'fixtures'"
+        >
+          Fixtures
+        </button>
+      </div>
+
+      <div>
+
+      </div>
+
+      <div v-if="activeTab === 'groups'" class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         <article
           v-for="group in GROUPS"
           :key="group.name"
@@ -54,12 +77,23 @@
         </article>
       </div>
 
-      <!-- <div class="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white/75">
-        <p class="font-semibold mb-3">How the page works</p>
-        <p class="leading-6">
-          Clicking a team marks it selected here. This page shows group membership and flags while the team pages remain separate.
-        </p>
-      </div> -->
+      <section v-else class="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-lg backdrop-blur">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-[11px] uppercase tracking-[0.35em] text-emerald-100/80">Fixtures</p>
+            <h2 class="text-xl font-semibold text-white">All FIFA World Cup 2026 matches</h2>
+            <p class="text-sm text-white/70">This uses the same live-score API and shows the full match list with results.</p>
+          </div>
+        </div>
+
+        <LiveScores
+          endpoint="/api/fixtures"
+          :limit="52"
+          :use-limit="false"
+          title="Fixtures"
+          subtitle="This uses the same live-score API and shows the full match list with results."
+        />
+      </section>
 
       <footer class="mt-12 text-center text-white/70">
         © {{ new Date().getFullYear() }} World Cup Hub created by <a href="https://mdnafizalifat.vercel.app/" target="_blank" class="underline hover:text-white">Md Nafiz Al ifat</a>.
@@ -70,7 +104,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import LiveScores from '@/components/LiveScores.vue'
 
+const activeTab = ref('groups')
 const selectedTeam = ref('')
 
 const GROUPS = [
