@@ -41,7 +41,7 @@
           </div>
         </div>
 
-        <p class="mt-3 text-xs text-white/70">{{ statusLabel(match) }}</p>
+        <p class="mt-3 text-xs text-white/70">{{ match.status? match.status : 'Fixture update pending' }}</p>
       </article>
     </div>
 
@@ -89,13 +89,13 @@ function formatDate(value) {
   })
 }
 
-function statusLabel(match) {
-  const code = Number(match.status_code ?? match.statusCode ?? 0)
-  if (code === 0) return 'Just finished'
-  if (code === 1) return 'About to start'
-  if (code === 2 || code === 3) return 'Live now'
-  return match.status_label || match.status || 'Fixture update pending'
-}
+// function statusLabel(match) {
+//   const code = Number(match.status_code ?? match.statusCode ?? 0)
+//   if (code === 0) return 'Just finished'
+//   if (code === 1) return 'About to start'
+//   if (code === 2 || code === 3) return 'Live now'
+//   return match.status_label || match.status || 'Fixture update pending'
+// }
 
 function normalizeMatch(match) {
   const homeTeam = match.home_team || match.homeTeam || {}
