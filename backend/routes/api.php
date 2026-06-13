@@ -18,28 +18,31 @@ Route::post('/chat', [ChatController::class, 'chat']);        // main endpoint f
 Route::get('/test-openai', [ChatController::class, 'test']);  // quick probe in browser
 
 Route::get('/live-scores', function (Request $request) {
+    $current_Date=  now()->format('Y-m-d');
+    if($current_Date < '2026-07-19'){
+        $start_date =$current_Date;
+
+    }else{
+        $start_date = '2026-07-19';
+    }
+
     try {
         $limit = (int) ($request->query('limit', 3) ?: 3);
 
         $response = Http::timeout(20)
             ->get('https://api.fifa.com/api/v3/calendar/matches', [
                 'language' => 'en',
-                'from' => '2026-06-11',
+                'from' => $start_date,
                 'to' => '2026-07-19',
-                'count' => 500,
+                'IdCompetition' => 17,
             ]);
 
-        $matches = collect($response->json('Results', []))
-            ->filter(function (array $match) {
-                $competition = $match['CompetitionName'][0]['Description'] ?? '';
-
-                return Str::contains(strtolower($competition), 'world cup');
-            })
-            ->map(function (array $match) {
+//        print_r($response->json());  die; // Debugging line to inspect the API response structure
+        $matches = collect($response->json('Results', []))->map(function (array $match) {
                 $statusCode = (int) ($match['MatchStatus'] ?? 0);
                 $statusLabel = match ($statusCode) {
                     0 => 'Just finished',
-                    1 => 'About to start',
+                    1 => 'Have not started',
                     2, 3 => 'Live now',
                     default => 'Fixture update pending',
                 };
@@ -87,20 +90,16 @@ Route::get('/fixtures', function (Request $request) {
                 'language' => 'en',
                 'from' => '2026-06-11',
                 'to' => '2026-07-19',
+                'IdCompetition' => 17,
                 'count' => 500,
             ]);
 
         $matches = collect($response->json('Results', []))
-            ->filter(function (array $match) {
-                $competition = $match['CompetitionName'][0]['Description'] ?? '';
-
-                return Str::contains(strtolower($competition), 'world cup');
-            })
             ->map(function (array $match) {
                 $statusCode = (int) ($match['MatchStatus'] ?? 0);
                 $statusLabel = match ($statusCode) {
                     0 => 'Just finished',
-                    1 => 'About to start',
+                    1 => 'Have not started',
                     2, 3 => 'Live now',
                     default => 'Fixture update pending',
                 };
