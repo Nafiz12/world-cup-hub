@@ -68,7 +68,7 @@ Route::get('/live-scores', function (Request $request) {
                     'status' => $statusLabel,
                 ];
             })
-            ->sortBy(['match_number', 'datetime'])
+            ->sortBy(['datetime'])
             ->values()
             ->take($limit)
             ->all();
