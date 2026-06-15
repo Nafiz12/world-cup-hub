@@ -139,10 +139,12 @@ async function loadMatches() {
     const list = Array.isArray(data) ? data : Array.isArray(data?.matches) ? data.matches : []
     const sorted = [...list].sort((a, b) => (Number(a.match_number || 0) - Number(b.match_number || 0)) || (String(a.datetime || '').localeCompare(String(b.datetime || ''))))
 
-    matches.value = (props.useLimit
-      ? sorted.slice(0, Number.isFinite(props.limit) && props.limit > 0 ? props.limit : 3)
-      : sorted
-    ).map(normalizeMatch)
+    // matches.value = (props.useLimit
+    //   ? sorted.slice(0, Number.isFinite(props.limit) && props.limit > 0 ? props.limit : 3)
+    //   : sorted
+    // ).map(normalizeMatch)
+matches.value = data.map(normalizeMatch)
+    
   } catch (e) {
     console.error('Live score fetch failed:', e)
     error.value = 'Could not load live scores right now. Please try again shortly.'
