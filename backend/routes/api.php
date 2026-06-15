@@ -18,7 +18,7 @@ Route::post('/chat', [ChatController::class, 'chat']);        // main endpoint f
 Route::get('/test-openai', [ChatController::class, 'test']);  // quick probe in browser
 
 Route::get('/live-scores', function (Request $request) {
-    $current_Date=  now()->format('Y-m-d');
+    $current_Date = now('UTC')->format('Y-m-d');
     if($current_Date < '2026-07-19'){
         $start_date =$current_Date;
 
@@ -37,7 +37,9 @@ Route::get('/live-scores', function (Request $request) {
                 'IdCompetition' => 17,
             ]);
 
-//        print_r($response->json());  die; // Debugging line to inspect the API response structure
+ // Debugging line to inspect the API response structure
+
+//        print_r($response->json()); die;
         $matches = collect($response->json('Results', []))->map(function (array $match) {
                 $statusCode = (int) ($match['MatchStatus'] ?? 0);
                 $statusLabel = match ($statusCode) {
@@ -68,7 +70,7 @@ Route::get('/live-scores', function (Request $request) {
                     'status' => $statusLabel,
                 ];
             })
-            ->sortBy(['datetime'])
+            ->sortBy(['datetime','match_number'])
             ->values()
             ->take($limit)
             ->all();
@@ -93,6 +95,8 @@ Route::get('/fixtures', function (Request $request) {
                 'IdCompetition' => 17,
                 'count' => 500,
             ]);
+
+//        print_r($response->json());  die;
 
         $matches = collect($response->json('Results', []))
             ->map(function (array $match) {
